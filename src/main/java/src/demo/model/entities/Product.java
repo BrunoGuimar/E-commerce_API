@@ -10,6 +10,7 @@ public class Product {
     private int id;
     private String name;
     private double price;
+    private int amount;
 
     public Product() {
     }
@@ -17,6 +18,15 @@ public class Product {
     public Product(String name, double price) {
         this.name = name;
         this.price = price;
+        this.amount = 1;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
     public int getId() {

@@ -17,23 +17,30 @@ public class ProductController {
 
     @PostMapping
     public Product addProduct(Product product){
-        return repository.save(product);
+        Product productAlreadyExists = repository.findByNameContainsIgnoreCase(product.getName());
+        if(productAlreadyExists != null){
+            productAlreadyExists.setAmount(productAlreadyExists.getAmount() + 1);
+            repository.save(productAlreadyExists);
+            return productAlreadyExists;
+        }
+        repository.save(product);
+        return product;
+
     }
 
     @PutMapping
     public Product setProduct(Product product, @RequestParam int id){
-        Product oldProduct = repository.findById(id).get();
-        if(product.getName() == null){
-            product.setPrice(product.getPrice());
-            product.setName(oldProduct.getName());
-            repository.save(product);
+        Product finalProduct = repository.findById(id).get();
+        if(product.getName() != null){
+            finalProduct.setName(product.getName());
         }
-        if(product.getPrice() == 0){
-            product.setName(product.getName());
-            product.setPrice(oldProduct.getPrice());
-            repository.save(product);
+        if(product.getPrice() != 0){
+            finalProduct.setPrice(product.getPrice());
         }
-        return product;
+        if(product.getAmount() > 0){
+            finalProduct.setAmount(product.getAmount());
+        }
+        return repository.save(finalProduct);
     }
 
     @GetMapping
@@ -47,7 +54,7 @@ public class ProductController {
     }
     @GetMapping(path = "/contains/{name}")
     public Product getProductsIfNameContains(@PathVariable String name){
-        return repository.findByNameContains(name);
+        return repository.findByNameContainsIgnoreCase(name);
     }
     @GetMapping(path = "/price/{biggerThan}")
     public Object getProductsWithPriceBiggerThan(@PathVariable double biggerThan){
